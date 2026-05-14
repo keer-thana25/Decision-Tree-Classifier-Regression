@@ -371,6 +371,4 @@ Through this project, we learned:
 
 ---
 
-## 📜 License
 
-This project is created for **educational and academic purposes**.

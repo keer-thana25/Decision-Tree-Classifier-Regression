@@ -40,6 +40,34 @@ from sklearn.metrics import (
 warnings.filterwarnings("ignore")
 
 # =========================================================
+# CONSTANTS
+# =========================================================
+
+USD_TO_INR = 83.5  # 1 USD = 83.5 INR (approximate)
+
+def format_inr(amount):
+    """Format amount in Indian Rupees with crore/lakh notation."""
+    if amount >= 1_00_00_000:  # 1 crore
+        crores = amount / 1_00_00_000
+        return f"Rs.{crores:.2f} Cr"
+    elif amount >= 1_00_000:   # 1 lakh
+        lakhs = amount / 1_00_000
+        return f"Rs.{lakhs:.2f} L"
+    else:
+        return f"Rs.{amount:,.0f}"
+
+def format_inr_symbol(amount):
+    """Format with rupee symbol for HTML display."""
+    if amount >= 1_00_00_000:
+        crores = amount / 1_00_00_000
+        return f"&#8377;{crores:.2f} Cr"
+    elif amount >= 1_00_000:
+        lakhs = amount / 1_00_000
+        return f"&#8377;{lakhs:.2f} L"
+    else:
+        return f"&#8377;{amount:,.0f}"
+
+# =========================================================
 # PAGE CONFIG
 # =========================================================
 
@@ -86,6 +114,83 @@ h1, h2, h3 {
     color: gray;
 }
 
+.predict-box {
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+    border: 2px solid #4CAF50;
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 20px;
+}
+
+/* ── Big result card ── */
+.result-box {
+    background: linear-gradient(135deg, #0D1B4B, #1a237e, #283593);
+    border-radius: 24px;
+    padding: 40px 30px 32px 30px;
+    margin-top: 20px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(26,35,126,0.35);
+}
+
+.result-label {
+    color: #90CAF9;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.result-price-inr {
+    color: #FFD54F;
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-shadow: 0 3px 12px rgba(0,0,0,0.5);
+    margin: 8px 0 4px 0;
+    line-height: 1.1;
+}
+
+.result-price-full {
+    color: #E3F2FD;
+    font-size: 20px;
+    font-weight: 500;
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+}
+
+.result-price-sub {
+    color: #90A4AE;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* ── Metric mini-cards ── */
+.metric-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px 22px;
+    text-align: center;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.09);
+    border-left: 5px solid #1565C0;
+    height: 100%;
+}
+
+.metric-label {
+    color: #607D8B;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+.metric-value {
+    color: #1565C0;
+    font-size: 28px;
+    font-weight: 900;
+    margin-top: 6px;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -103,7 +208,6 @@ menu = st.sidebar.radio(
         "🌸 Decision Tree Classifier",
         "🏠 Decision Tree Regression",
         "📐 Formula Page",
-      
     ]
 )
 
@@ -114,122 +218,58 @@ menu = st.sidebar.radio(
 if menu == "🏠 Home":
 
     st.title("🌳 Decision Tree Classifier and Decision Tree Regression")
-
     st.markdown("---")
-
     st.header("📌 Project Overview")
-
     st.write("""
-    This mini project explains the working of **Decision Tree Algorithms**
-    in Machine Learning.
-
+    This mini project explains the working of **Decision Tree Algorithms** in Machine Learning.
     Decision Trees are one of the most important supervised learning algorithms.
     They are simple, powerful, easy to understand, and widely used in both
     classification and regression problems.
     """)
 
     col1, col2 = st.columns(2)
-
     with col1:
         st.subheader("🌸 Decision Tree Classifier")
         st.write("""
-        A Decision Tree Classifier is used when the output is categorical.
-
-        Example:
-        - Spam or Not Spam
-        - Disease or No Disease
-        - Flower Type Prediction
+        A Decision Tree Classifier is used when the output is categorical.\n
+        Example:\n- Spam or Not Spam\n- Disease or No Disease\n- Flower Type Prediction
         """)
-
     with col2:
         st.subheader("🏠 Decision Tree Regression")
         st.write("""
-        A Decision Tree Regressor is used when the output is numerical.
-
-        Example:
-        - House Price Prediction
-        - Temperature Prediction
-        - Salary Prediction
+        A Decision Tree Regressor is used when the output is numerical.\n
+        Example:\n- House Price Prediction\n- Temperature Prediction\n- Salary Prediction
         """)
 
     st.markdown("---")
-
     st.header("🌍 Real World Applications")
-
-    applications = [
-        "Medical Diagnosis",
-        "Fraud Detection",
-        "Loan Approval Systems",
-        "Customer Segmentation",
-        "House Price Prediction",
-        "Weather Forecasting",
-        "Recommendation Systems"
-    ]
-
-    for app in applications:
+    for app in ["Medical Diagnosis","Fraud Detection","Loan Approval Systems",
+                 "Customer Segmentation","House Price Prediction","Weather Forecasting","Recommendation Systems"]:
         st.write(f"✅ {app}")
 
     st.markdown("---")
-
     st.header("⭐ Why Decision Trees are Important")
-
     st.write("""
-    - Easy to understand and interpret
-    - Handles both numerical and categorical data
-    - Requires less data preprocessing
-    - Visual representation is simple
+    - Easy to understand and interpret\n- Handles both numerical and categorical data
+    - Requires less data preprocessing\n- Visual representation is simple
     - Useful for decision-making systems
     """)
-
     st.markdown("---")
-
     col3, col4 = st.columns(2)
-
     with col3:
         st.subheader("✅ Advantages")
-        st.write("""
-        - Simple and easy to understand
-        - Works with nonlinear data
-        - Requires less preprocessing
-        - Good visualization
-        - Fast prediction
-        """)
-
+        st.write("- Simple and easy to understand\n- Works with nonlinear data\n- Requires less preprocessing\n- Good visualization\n- Fast prediction")
     with col4:
         st.subheader("❌ Disadvantages")
-        st.write("""
-        - Can overfit easily
-        - Sensitive to small data changes
-        - Less accurate than ensemble models
-        - Large trees become complex
-        """)
+        st.write("- Can overfit easily\n- Sensitive to small data changes\n- Less accurate than ensemble models\n- Large trees become complex")
 
     st.markdown("---")
-
     st.header("🔍 Classification vs Regression")
-
-    comparison_df = pd.DataFrame({
-        "Feature": [
-            "Output Type",
-            "Used For",
-            "Example",
-            "Algorithm"
-        ],
-        "Classification": [
-            "Categorical",
-            "Category Prediction",
-            "Spam/Not Spam",
-            "DecisionTreeClassifier"
-        ],
-        "Regression": [
-            "Continuous Numerical",
-            "Value Prediction",
-            "House Price",
-            "DecisionTreeRegressor"
-        ]
-    })
-
-    st.table(comparison_df)
+    st.table(pd.DataFrame({
+        "Feature": ["Output Type","Used For","Example","Algorithm"],
+        "Classification": ["Categorical","Category Prediction","Spam/Not Spam","DecisionTreeClassifier"],
+        "Regression": ["Continuous Numerical","Value Prediction","House Price","DecisionTreeRegressor"]
+    }))
 
 # =========================================================
 # THEORY PAGE
@@ -238,250 +278,66 @@ if menu == "🏠 Home":
 elif menu == "📘 Theory":
 
     st.title("📘 Detailed Theory of Decision Trees")
-
     st.markdown("---")
 
     st.header("A) What is Decision Tree?")
-
     st.write("""
-    A Decision Tree is a supervised machine learning algorithm used for
-    classification and regression tasks.
-
-    It works like a flowchart structure where:
-    - Root Node = Main decision point
-    - Internal Nodes = Conditions/Questions
-    - Leaf Nodes = Final output/result
+    A Decision Tree is a supervised machine learning algorithm used for classification and regression tasks.
+    It works like a flowchart structure where:\n
+    - Root Node = Main decision point\n- Internal Nodes = Conditions/Questions\n- Leaf Nodes = Final output/result
     """)
-
-    st.subheader("🌳 Structure of Decision Tree")
-
-    st.write("""
-    Root Node:
-    - First node of the tree
-    - Represents the entire dataset
-
-    Internal Node:
-    - Represents decision conditions
-    - Splits the dataset
-
-    Leaf Node:
-    - Final output node
-    - Represents prediction
-    """)
-
-    st.markdown("---")
 
     st.header("B) Decision Tree Classifier")
-
-    st.write("""
-    Decision Tree Classifier is used when the target variable is categorical.
-
-    Example:
-    - Predicting flower species
-    - Disease classification
-    - Email spam detection
-    """)
-
+    st.write("Decision Tree Classifier is used when the target variable is categorical.")
     st.subheader("🌸 Why Iris Dataset?")
-
-    st.write("""
-    Iris dataset is suitable because:
-    - It is simple and beginner-friendly
-    - Contains 3 flower classes
-    - Good for multiclass classification
-    - Easy visualization
-    """)
+    st.write("Simple, beginner-friendly, 3 flower classes, good for multiclass classification.")
 
     st.markdown("---")
-
     st.header("C) Decision Tree Regression")
-
-    st.write("""
-    Decision Tree Regression predicts continuous numerical values.
-
-    Example:
-    - House price prediction
-    - Sales prediction
-    - Temperature prediction
-    """)
-
+    st.write("Decision Tree Regression predicts continuous numerical values.")
     st.subheader("🏠 Why California Housing Dataset?")
-
-    st.write("""
-    California Housing dataset is suitable because:
-    - Contains real-world numerical values
-    - Ideal for regression tasks
-    - Predicts median house prices
-    """)
+    st.write("Contains real-world numerical values, ideal for regression, predicts median house prices.")
 
     st.markdown("---")
-
     st.header("D) Entropy")
-
     st.latex(r"Entropy(S) = -\sum p(x)\log_2 p(x)")
-
-    st.write("""
-    Entropy measures impurity or randomness in the dataset.
-
-    Pure Node:
-    - Contains only one class
-    - Entropy = 0
-
-    Impure Node:
-    - Contains mixed classes
-    - Entropy is high
-    """)
-
-    st.subheader("📌 High vs Low Entropy")
-
-    st.write("""
-    High Entropy:
-    - Data is mixed
-    - More uncertainty
-
-    Low Entropy:
-    - Data is pure
-    - Less uncertainty
-    """)
+    st.write("Entropy measures impurity or randomness. Pure Node = 0, Impure Node = high entropy.")
 
     st.markdown("---")
-
     st.header("E) Information Gain")
-
     st.latex(r"Information\ Gain = Entropy(parent) - Weighted\ Entropy(children)")
 
-    st.write("""
-    Information Gain measures how much information is gained after splitting.
-    The feature with highest information gain is selected.
-    """)
-
     st.markdown("---")
-
     st.header("F) Gini Index")
-
     st.latex(r"Gini = 1 - \sum p(x)^2")
-
-    st.write("""
-    Gini Index measures impurity.
-    Lower Gini Index means better split.
-    """)
+    st.write("Lower Gini Index means better split.")
 
     st.markdown("---")
-
-    st.header("G) Pure vs Impure Nodes")
-
-    st.write("""
-    Pure Node:
-    - All samples belong to one class
-    - No confusion
-    - Better prediction
-
-    Impure Node:
-    - Mixed classes
-    - More confusion
-    - Needs further splitting
-    """)
-
-    st.markdown("---")
-
-    st.header("H) Overfitting vs Underfitting")
-
+    st.header("G) Overfitting vs Underfitting")
     col1, col2 = st.columns(2)
-
     with col1:
         st.subheader("⚠️ Overfitting")
-        st.write("""
-        - Model memorizes training data
-        - Very complex tree
-        - Poor performance on new data
-        """)
-
+        st.write("Model memorizes training data. Very complex tree. Poor on new data.")
     with col2:
         st.subheader("⚠️ Underfitting")
-        st.write("""
-        - Model is too simple
-        - Cannot learn patterns properly
-        - Low accuracy
-        """)
+        st.write("Model is too simple. Cannot learn patterns. Low accuracy.")
 
     st.markdown("---")
-
-    st.header("I) Pruning")
-
-    st.write("""
-    Pruning reduces tree size and prevents overfitting.
-    """)
-
-    st.subheader("Pre-Pruning")
-    st.write("""
-    Stops tree growth early using:
-    - max_depth
-    - min_samples_split
-    """)
-
-    st.subheader("Post-Pruning")
-    st.write("""
-    Removes unnecessary branches after tree construction.
-    """)
+    st.header("H) Pruning")
+    st.write("Pre-Pruning: Stops early using max_depth, min_samples_split.")
+    st.write("Post-Pruning: Removes unnecessary branches after construction.")
 
     st.markdown("---")
-
-    st.header("J) Hyperparameters")
-
-    st.write("""
-    max_depth:
-    - Maximum depth of tree
-
-    min_samples_split:
-    - Minimum samples required to split
-
-    min_samples_leaf:
-    - Minimum samples in leaf node
-
-    random_state:
-    - Ensures same random output every time
-    """)
+    st.header("I) GridSearchCV")
+    st.write("Tests multiple parameter combinations using cross-validation to find best params.")
 
     st.markdown("---")
-
-    st.header("K) GridSearchCV")
-
-    st.write("""
-    GridSearchCV is used for hyperparameter tuning.
-
-    It:
-    - Tests multiple parameter combinations
-    - Uses cross validation
-    - Finds best parameters
-    - Improves model performance
-    """)
-
-    st.markdown("---")
-
-    st.header("L) Comparison Table")
-
-    comparison = pd.DataFrame({
-        "Feature": [
-            "Output",
-            "Dataset",
-            "Evaluation",
-            "Goal"
-        ],
-        "Classifier": [
-            "Categorical",
-            "Iris",
-            "Accuracy",
-            "Class Prediction"
-        ],
-        "Regression": [
-            "Continuous Numerical",
-            "California Housing",
-            "MAE/MSE/RMSE",
-            "Value Prediction"
-        ]
-    })
-
-    st.table(comparison)
+    st.header("J) Comparison Table")
+    st.table(pd.DataFrame({
+        "Feature": ["Output","Dataset","Evaluation","Goal"],
+        "Classifier": ["Categorical","Iris","Accuracy","Class Prediction"],
+        "Regression": ["Continuous Numerical","California Housing","MAE/MSE/RMSE","Value Prediction"]
+    }))
 
 # =========================================================
 # DECISION TREE CLASSIFIER
@@ -490,308 +346,129 @@ elif menu == "📘 Theory":
 elif menu == "🌸 Decision Tree Classifier":
 
     st.title("🌸 Decision Tree Classifier using Iris Dataset")
-
     st.markdown("---")
 
-    # =====================================================
-    # STEP 1
-    # =====================================================
-
     st.header("Step 1: Load Iris Dataset")
-
     iris = load_iris()
-
     st.write("Dataset Loaded Successfully ✅")
 
-    # =====================================================
-    # STEP 2
-    # =====================================================
-
     st.header("Step 2: Convert to DataFrame")
-
     df = pd.DataFrame(iris.data, columns=iris.feature_names)
     df["target"] = iris.target
-
     st.dataframe(df.head())
 
-    # =====================================================
-    # STEP 3
-    # =====================================================
-
-    st.header("Step 3: First 5 Rows and Last 5 Rows")
-
+    st.header("Step 3: First 5 and Last 5 Rows")
     col1, col2 = st.columns(2)
-
     with col1:
         st.subheader("First 5 Rows")
         st.dataframe(df.head())
-
     with col2:
         st.subheader("Last 5 Rows")
         st.dataframe(df.tail())
 
-    # =====================================================
-    # STEP 4
-    # =====================================================
-
     st.header("Step 4: Dataset Information")
-
-    st.write("Shape of Dataset:", df.shape)
-
-    st.subheader("Missing Values")
+    st.write("Shape:", df.shape)
     st.write(df.isnull().sum())
+    buf = io.StringIO(); df.info(buf=buf); st.text(buf.getvalue())
 
-    st.subheader("Dataset Info")
+    st.header("Step 5: Outlier Detection")
+    fig, ax = plt.subplots(figsize=(12,6)); sns.boxplot(data=df.drop("target",axis=1),ax=ax); st.pyplot(fig)
 
-    buffer = io.StringIO()
-    df.info(buf=buffer)
-    s = buffer.getvalue()
+    st.header("Step 6: Remove Outliers (IQR)")
+    Q1,Q3 = df.quantile(0.25), df.quantile(0.75); IQR = Q3-Q1
+    df_clean = df[~((df<(Q1-1.5*IQR))|(df>(Q3+1.5*IQR))).any(axis=1)]
+    st.write("Original:",df.shape,"→ Cleaned:",df_clean.shape)
 
-    st.text(s)
+    st.header("Step 7: After Outlier Removal")
+    fig2,ax2=plt.subplots(figsize=(12,6)); sns.boxplot(data=df_clean.drop("target",axis=1),ax=ax2); st.pyplot(fig2)
 
-    # =====================================================
-    # STEP 5
-    # =====================================================
-
-    st.header("Step 5: Outlier Detection using Boxplot")
-
-    fig, ax = plt.subplots(figsize=(12, 6))
-    sns.boxplot(data=df.drop("target", axis=1), ax=ax)
-    st.pyplot(fig)
-
-    # =====================================================
-    # STEP 6
-    # =====================================================
-
-    st.header("Step 6: Handle Outliers using IQR Method")
-
-    Q1 = df.quantile(0.25)
-    Q3 = df.quantile(0.75)
-
-    IQR = Q3 - Q1
-
-    df_clean = df[~((df < (Q1 - 1.5 * IQR)) |
-                    (df > (Q3 + 1.5 * IQR))).any(axis=1)]
-
-    st.write("Original Shape:", df.shape)
-    st.write("After Removing Outliers:", df_clean.shape)
-
-    # =====================================================
-    # STEP 7
-    # =====================================================
-
-    st.header("Step 7: Visualization After Removing Outliers")
-
-    fig2, ax2 = plt.subplots(figsize=(12, 6))
-    sns.boxplot(data=df_clean.drop("target", axis=1), ax=ax2)
-    st.pyplot(fig2)
-
-    # =====================================================
-    # STEP 8
-    # =====================================================
-
-    st.header("Step 8: Iris Target")
-
+    st.header("Step 8: Iris Target Names")
     st.write(iris.target_names)
 
-    # =====================================================
-    # STEP 9
-    # =====================================================
-
-    st.header("Step 9: Feature Scaling using StandardScaler")
-
-    X = df_clean.drop("target", axis=1)
-    y = df_clean["target"]
-
-    scaler = StandardScaler()
-
-    X_scaled = scaler.fit_transform(X)
-
+    st.header("Step 9: Feature Scaling")
+    X = df_clean.drop("target",axis=1); y = df_clean["target"]
+    scaler = StandardScaler(); X_scaled = scaler.fit_transform(X)
     st.write("Feature Scaling Completed ✅")
 
-    # =====================================================
-    # STEP 10
-    # =====================================================
-
     st.header("Step 10: Train Test Split")
+    X_train,X_test,y_train,y_test = train_test_split(X_scaled,y,test_size=0.2,random_state=42)
+    st.write("Train:",X_train.shape,"| Test:",X_test.shape)
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X_scaled,
-        y,
-        test_size=0.2,
-        random_state=42
-    )
-
-    st.write("Training Data Shape:", X_train.shape)
-    st.write("Testing Data Shape:", X_test.shape)
-
-    # =====================================================
-    # STEP 11
-    # =====================================================
-
-    st.header("Step 11: Train DecisionTreeClassifier")
-
-    model = DecisionTreeClassifier(random_state=42)
-
-    model.fit(X_train, y_train)
-
-    st.write("Model Trained Successfully ✅")
-
-    # =====================================================
-    # STEP 12
-    # =====================================================
+    st.header("Step 11: Train Model")
+    model = DecisionTreeClassifier(random_state=42); model.fit(X_train,y_train)
+    st.write("Model Trained ✅")
 
     st.header("Step 12: Model Parameters")
-
     st.write(model.get_params())
 
-    # =====================================================
-    # STEP 13
-    # =====================================================
-
     st.header("Step 13: Warnings Suppressed")
+    st.write("Warnings suppressed ✅")
 
-    st.write("Warnings imported and suppressed successfully ✅")
+    st.header("Step 14: GridSearchCV")
+    param_grid={"max_depth":[2,3,4,5],"min_samples_split":[2,3,4],"min_samples_leaf":[1,2,3]}
+    grid=GridSearchCV(DecisionTreeClassifier(random_state=42),param_grid,cv=5)
+    grid.fit(X_train,y_train)
 
-    # =====================================================
-    # STEP 14
-    # =====================================================
-
-    st.header("Step 14: Apply GridSearchCV")
-
-    param_grid = {
-        "max_depth": [2, 3, 4, 5],
-        "min_samples_split": [2, 3, 4],
-        "min_samples_leaf": [1, 2, 3]
-    }
-
-    grid = GridSearchCV(
-        DecisionTreeClassifier(random_state=42),
-        param_grid,
-        cv=5
-    )
-
-    grid.fit(X_train, y_train)
-
-    # =====================================================
-    # STEP 15
-    # =====================================================
-
-    st.header("Step 15: Best Parameters and Best Score")
-
-    st.write("Best Parameters:", grid.best_params_)
-    st.write("Best Score:", grid.best_score_)
-
-    # =====================================================
-    # STEP 16
-    # =====================================================
+    st.header("Step 15: Best Parameters")
+    st.write("Best Params:",grid.best_params_); st.write("Best Score:",grid.best_score_)
 
     st.header("Step 16: Prediction")
-
-    best_model = grid.best_estimator_
-
-    y_pred = best_model.predict(X_test)
-
+    best_model=grid.best_estimator_; y_pred=best_model.predict(X_test)
     st.write("Predictions Completed ✅")
 
-    # =====================================================
-    # STEP 17
-    # =====================================================
-
     st.header("Step 17: Evaluation")
+    cm=confusion_matrix(y_test,y_pred)
+    st.write(cm); st.text(classification_report(y_test,y_pred))
+    st.write("Accuracy:",accuracy_score(y_test,y_pred))
 
-    cm = confusion_matrix(y_test, y_pred)
+    st.header("Step 18: Confusion Matrix Heatmap")
+    fig3,ax3=plt.subplots(figsize=(6,5))
+    sns.heatmap(cm,annot=True,fmt="d",cmap="Blues",ax=ax3)
+    ax3.set_xlabel("Predicted"); ax3.set_ylabel("Actual"); st.pyplot(fig3)
 
-    st.subheader("Confusion Matrix")
-    st.write(cm)
+    st.header("Step 19: Decision Tree Visualization")
+    viz_depth=st.slider("Max Depth",1,10,3,key="clf_viz_depth")
+    fig4,ax4=plt.subplots(figsize=(20,10))
+    plot_tree(best_model,max_depth=viz_depth,filled=True,feature_names=iris.feature_names,
+              class_names=iris.target_names,rounded=True,fontsize=10,ax=ax4)
+    ax4.set_title(f"Decision Tree — Depth {viz_depth}"); st.pyplot(fig4)
+    st.caption(f"Actual model depth: {best_model.get_depth()}")
 
-    st.subheader("Classification Report")
+    st.header("Step 20: Result")
+    st.success("Decision Tree Classifier successfully classified Iris flowers using GridSearchCV.")
 
-    report = classification_report(y_test, y_pred)
-    st.text(report)
+    # ──────────────────────────────────────────────────────
+    # STEP 21: Predict Your Own Iris Flower
+    # ──────────────────────────────────────────────────────
+    st.markdown("---")
+    st.header("Step 21: 🔮 Predict Your Own Iris Flower")
+    st.markdown('<div class="predict-box"><h4 style="color:#2E7D32;">🌸 Enter flower measurements to predict species!</h4></div>', unsafe_allow_html=True)
+    st.write("")
 
-    accuracy = accuracy_score(y_test, y_pred)
+    idf = pd.DataFrame(iris.data, columns=iris.feature_names)
+    col_a, col_b = st.columns(2)
+    with col_a:
+        sl = st.number_input("Sepal Length (cm)", float(idf.min()["sepal length (cm)"]), float(idf.max()["sepal length (cm)"]), float(round(idf.mean()["sepal length (cm)"],1)), 0.1, key="clf_sl")
+        sw = st.number_input("Sepal Width (cm)",  float(idf.min()["sepal width (cm)"]),  float(idf.max()["sepal width (cm)"]),  float(round(idf.mean()["sepal width (cm)"],1)),  0.1, key="clf_sw")
+    with col_b:
+        pl = st.number_input("Petal Length (cm)", float(idf.min()["petal length (cm)"]), float(idf.max()["petal length (cm)"]), float(round(idf.mean()["petal length (cm)"],1)), 0.1, key="clf_pl")
+        pw = st.number_input("Petal Width (cm)",  float(idf.min()["petal width (cm)"]),  float(idf.max()["petal width (cm)"]),  float(round(idf.mean()["petal width (cm)"],1)),  0.1, key="clf_pw")
 
-    st.subheader("Accuracy Score")
-    st.write(accuracy)
-
-    # =====================================================
-    # STEP 18
-    # =====================================================
-
-    st.header("Step 18: Visualize Confusion Matrix")
-
-    fig3, ax3 = plt.subplots(figsize=(6, 5))
-
-    sns.heatmap(
-        cm,
-        annot=True,
-        fmt="d",
-        cmap="Blues",
-        ax=ax3
-    )
-
-    ax3.set_xlabel("Predicted")
-    ax3.set_ylabel("Actual")
-
-    st.pyplot(fig3)
-
-    # =====================================================
-    # STEP 19 — CHANGED: Multi-depth Decision Tree Visualization
-    # =====================================================
-
-    st.header("Step 19: Visualize Decision Tree")
-
-    st.info("🔍 Use the slider below to explore the tree at different depths. Lower depth = simpler and clearer view.")
-
-    viz_depth = st.slider(
-        "Select Max Depth for Visualization",
-        min_value=1,
-        max_value=10,
-        value=3,
-        step=1,
-        key="clf_viz_depth"
-    )
-
-    st.subheader(f"Decision Tree Visualization — Max Depth: {viz_depth}")
-
-    fig4, ax4 = plt.subplots(figsize=(20, 10))
-
-    plot_tree(
-        best_model,
-        max_depth=viz_depth,
-        filled=True,
-        feature_names=iris.feature_names,
-        class_names=iris.target_names,
-        rounded=True,
-        fontsize=10,
-        ax=ax4
-    )
-
-    ax4.set_title(f"Decision Tree Classifier — Showing Depth {viz_depth}", fontsize=14)
-
-    st.pyplot(fig4)
-
-    st.caption(
-        "💡 Tip: Depth 1–2 shows the most important splits. "
-        "Increase depth gradually to see more detail. "
-        f"The trained model's actual best depth is: {best_model.get_depth()}"
-    )
-
-    # =====================================================
-    # STEP 20
-    # =====================================================
-
-    st.header("Step 20: Result Explanation")
-
-    st.success("""
-    The Decision Tree Classifier successfully classified the Iris flowers.
-
-    - GridSearchCV helped find the best parameters.
-    - Confusion Matrix shows prediction performance.
-    - Accuracy Score indicates how well the model performed.
-    - Decision Tree visualization shows decision rules clearly.
-    """)
+    if st.button("🌸 Predict Flower Species", key="clf_predict_btn"):
+        inp = scaler.transform([[sl,sw,pl,pw]])
+        pred = best_model.predict(inp)[0]
+        proba = best_model.predict_proba(inp)[0]
+        name = iris.target_names[pred]
+        emoji = {"setosa":"🌺","versicolor":"🌸","virginica":"🌼"}.get(name,"🌸")
+        st.markdown(f'<div class="result-box"><div class="result-label">Predicted Flower Species</div><div class="result-price-inr">{emoji} Iris {name.upper()} {emoji}</div><div class="result-price-full">Confidence: {max(proba)*100:.1f}%</div></div>', unsafe_allow_html=True)
+        st.write("")
+        prob_df = pd.DataFrame({"Species":iris.target_names,"Probability (%)": [round(p*100,2) for p in proba]})
+        st.dataframe(prob_df, use_container_width=True)
+        fig_p,ax_p=plt.subplots(figsize=(7,4))
+        ax_p.bar(iris.target_names, proba*100, color=["#FF7043","#42A5F5","#66BB6A"], edgecolor="black")
+        for i,v in enumerate(proba*100): ax_p.text(i,v+1.5,f"{v:.1f}%",ha="center",fontweight="bold")
+        ax_p.set_ylim(0,110); ax_p.set_title("Prediction Probability per Class"); st.pyplot(fig_p)
+        st.success(f"✅ Iris **{name}** — {max(proba)*100:.1f}% confidence")
 
 # =========================================================
 # DECISION TREE REGRESSION
@@ -800,289 +477,242 @@ elif menu == "🌸 Decision Tree Classifier":
 elif menu == "🏠 Decision Tree Regression":
 
     st.title("🏠 Decision Tree Regression using California Housing Dataset")
-
     st.markdown("---")
 
-    # =====================================================
-    # STEP 1
-    # =====================================================
-
-    st.header("Step 1: Load California Housing Dataset")
-
+    st.header("Step 1: Load Dataset")
     housing = fetch_california_housing()
+    st.write("Dataset Loaded ✅")
 
-    st.write("Dataset Loaded Successfully ✅")
-
-    # =====================================================
-    # STEP 2
-    # =====================================================
-
-    st.header("Step 2: Convert to DataFrame")
-
+    st.header("Step 2: DataFrame")
     df = pd.DataFrame(housing.data, columns=housing.feature_names)
-
     df["target"] = housing.target
-
     st.dataframe(df.head())
 
-    # =====================================================
-    # STEP 3
-    # =====================================================
+    st.header("Step 3: First & Last 5 Rows")
+    c1,c2=st.columns(2)
+    with c1: st.subheader("First 5"); st.dataframe(df.head())
+    with c2: st.subheader("Last 5");  st.dataframe(df.tail())
 
-    st.header("Step 3: First 5 Rows and Last 5 Rows")
+    st.header("Step 4: Info")
+    st.write("Shape:",df.shape); st.write(df.isnull().sum())
+    buf=io.StringIO(); df.info(buf=buf); st.text(buf.getvalue())
 
-    col1, col2 = st.columns(2)
+    st.header("Step 5: Outlier Boxplot")
+    fig5,ax5=plt.subplots(figsize=(15,7)); sns.boxplot(data=df.drop("target",axis=1),ax=ax5); st.pyplot(fig5)
 
-    with col1:
-        st.subheader("First 5 Rows")
-        st.dataframe(df.head())
+    st.header("Step 6: Remove Outliers")
+    Q1,Q3=df.quantile(0.25),df.quantile(0.75); IQR=Q3-Q1
+    df_clean=df[~((df<(Q1-1.5*IQR))|(df>(Q3+1.5*IQR))).any(axis=1)]
+    st.write("Original:",df.shape,"→ Cleaned:",df_clean.shape)
 
-    with col2:
-        st.subheader("Last 5 Rows")
-        st.dataframe(df.tail())
+    st.header("Step 7: After Removal")
+    fig6,ax6=plt.subplots(figsize=(15,7)); sns.boxplot(data=df_clean.drop("target",axis=1),ax=ax6); st.pyplot(fig6)
 
-    # =====================================================
-    # STEP 4
-    # =====================================================
-
-    st.header("Step 4: Dataset Information")
-
-    st.write("Shape:", df.shape)
-
-    st.subheader("Missing Values")
-    st.write(df.isnull().sum())
-
-    buffer = io.StringIO()
-    df.info(buf=buffer)
-    s = buffer.getvalue()
-
-    st.subheader("Info()")
-    st.text(s)
-
-    # =====================================================
-    # STEP 5
-    # =====================================================
-
-    st.header("Step 5: Outlier Detection using Boxplot")
-
-    fig5, ax5 = plt.subplots(figsize=(15, 7))
-
-    sns.boxplot(data=df.drop("target", axis=1), ax=ax5)
-
-    st.pyplot(fig5)
-
-    # =====================================================
-    # STEP 6
-    # =====================================================
-
-    st.header("Step 6: Handle Outliers using IQR Method")
-
-    Q1 = df.quantile(0.25)
-    Q3 = df.quantile(0.75)
-
-    IQR = Q3 - Q1
-
-    df_clean = df[~((df < (Q1 - 1.5 * IQR)) |
-                    (df > (Q3 + 1.5 * IQR))).any(axis=1)]
-
-    st.write("Original Shape:", df.shape)
-    st.write("After Removing Outliers:", df_clean.shape)
-
-    # =====================================================
-    # STEP 7
-    # =====================================================
-
-    st.header("Step 7: Visualization After Removing Outliers")
-
-    fig6, ax6 = plt.subplots(figsize=(15, 7))
-
-    sns.boxplot(data=df_clean.drop("target", axis=1), ax=ax6)
-
-    st.pyplot(fig6)
-
-    # =====================================================
-    # STEP 8
-    # =====================================================
-
-    st.header("Step 8: Feature Scaling using StandardScaler")
-
-    X = df_clean.drop("target", axis=1)
-    y = df_clean["target"]
-
-    scaler = StandardScaler()
-
-    X_scaled = scaler.fit_transform(X)
-
+    st.header("Step 8: Feature Scaling")
+    X=df_clean.drop("target",axis=1); y=df_clean["target"]
+    scaler=StandardScaler(); X_scaled=scaler.fit_transform(X)
     st.write("Scaling Completed ✅")
 
-    # =====================================================
-    # STEP 9
-    # =====================================================
-
     st.header("Step 9: Train Test Split")
+    X_train,X_test,y_train,y_test=train_test_split(X_scaled,y,test_size=0.2,random_state=42)
+    st.write("Train:",X_train.shape,"| Test:",X_test.shape)
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X_scaled,
-        y,
-        test_size=0.2,
-        random_state=42
-    )
+    st.header("Step 10: Train Regressor")
+    regressor=DecisionTreeRegressor(random_state=42); regressor.fit(X_train,y_train)
+    st.write("Model Trained ✅")
 
-    st.write("Train Shape:", X_train.shape)
-    st.write("Test Shape:", X_test.shape)
-
-    # =====================================================
-    # STEP 10
-    # =====================================================
-
-    st.header("Step 10: Train DecisionTreeRegressor")
-
-    regressor = DecisionTreeRegressor(random_state=42)
-
-    regressor.fit(X_train, y_train)
-
-    st.write("Model Trained Successfully ✅")
-
-    # =====================================================
-    # STEP 11
-    # =====================================================
-
-    st.header("Step 11: Model Parameters")
-
+    st.header("Step 11: Parameters")
     st.write(regressor.get_params())
 
-    # =====================================================
-    # STEP 12
-    # =====================================================
+    st.header("Step 12: GridSearchCV")
+    param_grid={"max_depth":[3,5,7],"min_samples_split":[2,5,10],"min_samples_leaf":[1,2,4]}
+    grid=GridSearchCV(DecisionTreeRegressor(random_state=42),param_grid,cv=5)
+    grid.fit(X_train,y_train)
 
-    st.header("Step 12: Apply GridSearchCV")
-
-    param_grid = {
-        "max_depth": [3, 5, 7],
-        "min_samples_split": [2, 5, 10],
-        "min_samples_leaf": [1, 2, 4]
-    }
-
-    grid = GridSearchCV(
-        DecisionTreeRegressor(random_state=42),
-        param_grid,
-        cv=5
-    )
-
-    grid.fit(X_train, y_train)
-
-    # =====================================================
-    # STEP 13
-    # =====================================================
-
-    st.header("Step 13: Best Parameters and Best Score")
-
-    st.write("Best Parameters:", grid.best_params_)
-    st.write("Best Score:", grid.best_score_)
-
-    # =====================================================
-    # STEP 14
-    # =====================================================
+    st.header("Step 13: Best Parameters")
+    st.write("Best Params:",grid.best_params_); st.write("Best Score:",grid.best_score_)
 
     st.header("Step 14: Prediction")
-
-    best_regressor = grid.best_estimator_
-
-    y_pred = best_regressor.predict(X_test)
-
+    best_regressor=grid.best_estimator_; y_pred=best_regressor.predict(X_test)
     st.write("Prediction Completed ✅")
 
-    # =====================================================
-    # STEP 15
-    # =====================================================
-
     st.header("Step 15: Evaluation Metrics")
+    mae=mean_absolute_error(y_test,y_pred); mse=mean_squared_error(y_test,y_pred)
+    rmse=np.sqrt(mse); r2=r2_score(y_test,y_pred)
+    st.write("MAE:",mae); st.write("MSE:",mse); st.write("RMSE:",rmse); st.write("R²:",r2)
 
-    mae = mean_absolute_error(y_test, y_pred)
+    st.header("Step 16: Actual vs Predicted")
+    fig7,ax7=plt.subplots(figsize=(10,6))
+    ax7.scatter(y_test[:200],y_pred[:200]); ax7.set_xlabel("Actual"); ax7.set_ylabel("Predicted"); ax7.set_title("Actual vs Predicted"); st.pyplot(fig7)
 
-    mse = mean_squared_error(y_test, y_pred)
+    st.header("Step 17: Tree Visualization")
+    viz_depth=st.slider("Max Depth",1,10,3,key="reg_viz_depth")
+    fig8,ax8=plt.subplots(figsize=(20,10))
+    plot_tree(best_regressor,max_depth=viz_depth,filled=True,feature_names=housing.feature_names,fontsize=8,ax=ax8)
+    ax8.set_title(f"Decision Tree Regressor — Depth {viz_depth}"); st.pyplot(fig8)
+    st.caption(f"Actual model depth: {best_regressor.get_depth()}")
 
-    rmse = np.sqrt(mse)
+    st.header("Step 18: Result")
+    st.success("Decision Tree Regressor successfully predicted housing prices.")
 
-    r2 = r2_score(y_test, y_pred)
+    # ──────────────────────────────────────────────────────
+    # STEP 19: Predict Your Own House Price — IN INR ₹
+    # ──────────────────────────────────────────────────────
+    st.markdown("---")
+    st.header("Step 19: 🔮 Predict Your Own House Price")
 
-    st.write("Mean Absolute Error (MAE):", mae)
-    st.write("Mean Squared Error (MSE):", mse)
-    st.write("Root Mean Squared Error (RMSE):", rmse)
-    st.write("R² Score:", r2)
+    st.markdown("""
+    <div class="predict-box">
+        <h4 style="color:#1565C0;">🏠 Enter house details to predict the median house value in Indian Rupees (&#8377;)!</h4>
+    </div>
+    """, unsafe_allow_html=True)
+    st.write("")
 
-    # =====================================================
-    # STEP 16
-    # =====================================================
+    feat_df   = pd.DataFrame(housing.data, columns=housing.feature_names)
+    feat_mins = feat_df.min(); feat_maxs = feat_df.max(); feat_means = feat_df.mean()
 
-    st.header("Step 16: Actual vs Predicted Graph")
+    feature_descriptions = {
+        "MedInc":    "Median Income (in $10,000s)",
+        "HouseAge":  "House Age (years)",
+        "AveRooms":  "Avg Rooms per Household",
+        "AveBedrms": "Avg Bedrooms per Household",
+        "Population":"Block Population",
+        "AveOccup":  "Avg Occupants per Household",
+        "Latitude":  "Latitude",
+        "Longitude": "Longitude"
+    }
 
-    fig7, ax7 = plt.subplots(figsize=(10, 6))
+    st.subheader("📥 Input House Feature Values")
+    cols_pairs = [st.columns(2) for _ in range(4)]
+    flat_cols  = [c for pair in cols_pairs for c in pair]
+    user_reg_inputs = {}
+    for i, feat in enumerate(housing.feature_names):
+        with flat_cols[i]:
+            user_reg_inputs[feat] = st.number_input(
+                feature_descriptions.get(feat, feat),
+                min_value=float(feat_mins[feat]), max_value=float(feat_maxs[feat]),
+                value=float(round(feat_means[feat],2)),
+                step=0.01 if feat_maxs[feat]<10 else 1.0,
+                key=f"reg_input_{feat}"
+            )
 
-    ax7.scatter(y_test[:200], y_pred[:200])
+    st.write("")
 
-    ax7.set_xlabel("Actual Values")
-    ax7.set_ylabel("Predicted Values")
+    if st.button("🏠 Predict House Price", key="reg_predict_btn"):
 
-    ax7.set_title("Actual vs Predicted")
+        user_arr    = np.array([[user_reg_inputs[f] for f in housing.feature_names]])
+        user_scaled = scaler.transform(user_arr)
+        reg_pred    = best_regressor.predict(user_scaled)[0]
 
-    st.pyplot(fig7)
+        price_usd = reg_pred * 100_000          # dataset unit = $100k
+        price_inr = price_usd * USD_TO_INR      # convert to INR
 
-    # =====================================================
-    # STEP 17 — CHANGED: Multi-depth Decision Tree Visualization
-    # =====================================================
+        inr_short = format_inr_symbol(price_inr)          # ₹X.XX Cr / L
+        inr_full  = f"&#8377;{price_inr:,.0f}"             # ₹12,34,56,789
+        usd_fmt   = f"${price_usd:,.0f}"
 
-    st.header("Step 17: Visualize Decision Tree Regression")
+        st.markdown("---")
+        st.subheader("📊 Prediction Results")
 
-    st.info("🔍 Use the slider below to explore the tree at different depths. Lower depth = fewer nodes and clearer view.")
+        # ── Big Dark Card ─────────────────────────────────
+        st.markdown(f"""
+        <div class="result-box">
+            <div class="result-label">&#127968; Predicted Median House Value</div>
+            <div class="result-price-inr">{inr_short}</div>
+            <div class="result-price-full">{inr_full}</div>
+            <div class="result-price-sub">
+                &#127482;&#127480; Equivalent: <strong>{usd_fmt}</strong>
+                &nbsp;&nbsp;|&nbsp;&nbsp; Exchange Rate: 1 USD = &#8377;{USD_TO_INR}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    viz_depth = st.slider(
-        "Select Max Depth for Visualization",
-        min_value=1,
-        max_value=10,
-        value=3,
-        step=1,
-        key="reg_viz_depth"
-    )
+        st.write("")
 
-    st.subheader(f"Decision Tree Visualization — Max Depth: {viz_depth}")
+        # ── Three Metric Cards ────────────────────────────
+        mc1, mc2, mc3 = st.columns(3)
+        with mc1:
+            st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-label">Model Raw Output</div>
+                <div class="metric-value">{reg_pred:.4f}</div>
+                <div style="color:#90A4AE;font-size:12px;">&#215; $100,000 units</div>
+            </div>""", unsafe_allow_html=True)
+        with mc2:
+            st.markdown(f"""
+            <div class="metric-card" style="border-left-color:#FF9800;">
+                <div class="metric-label">Price in USD</div>
+                <div class="metric-value" style="color:#E65100;">{usd_fmt}</div>
+                <div style="color:#90A4AE;font-size:12px;">US Dollars</div>
+            </div>""", unsafe_allow_html=True)
+        with mc3:
+            lakh_val = price_inr / 1_00_000
+            st.markdown(f"""
+            <div class="metric-card" style="border-left-color:#4CAF50;">
+                <div class="metric-label">Price in INR</div>
+                <div class="metric-value" style="color:#2E7D32;">{inr_short}</div>
+                <div style="color:#90A4AE;font-size:12px;">= &#8377;{lakh_val:,.2f} Lakhs</div>
+            </div>""", unsafe_allow_html=True)
 
-    fig8, ax8 = plt.subplots(figsize=(20, 10))
+        st.write("")
 
-    plot_tree(
-        best_regressor,
-        max_depth=viz_depth,
-        filled=True,
-        feature_names=housing.feature_names,
-        fontsize=8,
-        ax=ax8
-    )
+        # ── Price Comparison Bar Chart ────────────────────
+        st.subheader("💰 Price Breakdown — USD vs INR Visual")
+        fig_p, ax_p = plt.subplots(figsize=(9,5))
+        fig_p.patch.set_facecolor("#f5f7fa"); ax_p.set_facecolor("#f5f7fa")
 
-    ax8.set_title(f"Decision Tree Regressor — Showing Depth {viz_depth}", fontsize=14)
+        # Show INR in Lakhs so both bars are comparable
+        usd_val_plot = price_usd
+        inr_val_plot = price_inr / 1_00_000   # in Lakhs
 
-    st.pyplot(fig8)
+        categories = [f"USD Price\n({usd_fmt})", f"INR Price\n({inr_short})"]
+        values     = [usd_val_plot, inr_val_plot]
+        colors     = ["#1565C0", "#FF8F00"]
 
-    st.caption(
-        "💡 Tip: Start at Depth 1–2 to see the most impactful splits clearly. "
-        "Increase depth to explore more nodes. "
-        f"The trained model's actual best depth is: {best_regressor.get_depth()}"
-    )
+        bars = ax_p.bar(categories, values, color=colors, width=0.45,
+                        edgecolor="white", linewidth=2, zorder=3)
+        ax_p.yaxis.grid(True, linestyle="--", alpha=0.5, zorder=0)
+        ax_p.set_axisbelow(True)
 
-    # =====================================================
-    # STEP 18
-    # =====================================================
+        labels = [usd_fmt, f"{inr_short}\n(Rs.{inr_val_plot:,.2f} L)"]
+        for bar, lbl, color in zip(bars, labels, colors):
+            ax_p.text(bar.get_x() + bar.get_width()/2,
+                      bar.get_height() + max(values)*0.025,
+                      lbl, ha="center", va="bottom",
+                      fontsize=12, fontweight="bold", color=color)
 
-    st.header("Step 18: Result Explanation")
+        ax_p.set_ylabel("Value (USD  |  INR in Lakhs)", fontsize=11)
+        ax_p.set_title("Predicted House Price — USD vs INR", fontsize=13, fontweight="bold", pad=14)
+        ax_p.spines[["top","right"]].set_visible(False)
+        ax_p.yaxis.set_major_formatter(plt.FuncFormatter(lambda x,_: f"{x:,.0f}"))
+        st.pyplot(fig_p)
 
-    st.success("""
-    The Decision Tree Regressor successfully predicted housing prices.
+        # ── Input Summary ─────────────────────────────────
+        st.subheader("📋 Your Input Summary")
+        st.table(pd.DataFrame({
+            "Feature": [feature_descriptions.get(f,f) for f in housing.feature_names],
+            "Value Entered": [user_reg_inputs[f] for f in housing.feature_names]
+        }))
 
-    - MAE measures average error.
-    - MSE measures squared error.
-    - RMSE gives root error value.
-    - R² Score measures model performance.
-    - GridSearchCV optimized the model.
-    """)
+        # ── Your Input vs Dataset Average ─────────────────
+        st.subheader("📈 Your Input vs Dataset Average")
+        cmp_df = pd.DataFrame([{
+            "Feature": feature_descriptions.get(feat,feat),
+            "Your Value": round(user_reg_inputs[feat],3),
+            "Dataset Average": round(float(feat_means[feat]),3)
+        } for feat in housing.feature_names])
+        st.dataframe(cmp_df, use_container_width=True)
+
+        fig_bar, ax_bar = plt.subplots(figsize=(12,5))
+        x=np.arange(len(housing.feature_names)); w=0.35
+        ax_bar.bar(x-w/2,[user_reg_inputs[f] for f in housing.feature_names],w,label="Your Input",color="#42A5F5",edgecolor="black")
+        ax_bar.bar(x+w/2,[float(feat_means[f]) for f in housing.feature_names],w,label="Dataset Avg",color="#FFA726",edgecolor="black")
+        ax_bar.set_xticks(x); ax_bar.set_xticklabels(housing.feature_names,rotation=30,ha="right")
+        ax_bar.set_title("Your Input vs Dataset Average"); ax_bar.legend()
+        st.pyplot(fig_bar)
+
+        st.success(f"✅ Predicted Median House Value: **{inr_short}** ({inr_full})")
+        st.info(f"ℹ️ Conversion: {reg_pred:.4f} × $100,000 = {usd_fmt} × ₹{USD_TO_INR} = {inr_short}")
 
 # =========================================================
 # FORMULA PAGE
@@ -1091,63 +721,27 @@ elif menu == "🏠 Decision Tree Regression":
 elif menu == "📐 Formula Page":
 
     st.title("📐 Important Formulas")
-
     st.markdown("---")
 
-    st.header("Entropy")
-
-    st.latex(r"Entropy(S) = -\sum p(x)\log_2 p(x)")
-
-    st.markdown("---")
-
-    st.header("Information Gain")
-
-    st.latex(r"IG = Entropy(parent) - Weighted\ Entropy(children)")
-
-    st.markdown("---")
-
-    st.header("Gini Index")
-
-    st.latex(r"Gini = 1 - \sum p(x)^2")
-
-    st.markdown("---")
-
-    st.header("Accuracy")
-
-    st.latex(r"Accuracy = \frac{Correct\ Predictions}{Total\ Predictions}")
-
-    st.markdown("---")
-
-    st.header("MAE")
-
-    st.latex(r"MAE = \frac{1}{n}\sum |y - \hat{y}|")
-
-    st.markdown("---")
-
-    st.header("MSE")
-
-    st.latex(r"MSE = \frac{1}{n}\sum (y - \hat{y})^2")
-
-    st.markdown("---")
-
-    st.header("RMSE")
-
-    st.latex(r"RMSE = \sqrt{MSE}")
-
-    st.markdown("---")
-
-    st.header("R² Score")
-
-    st.latex(r"R^2 = 1 - \frac{SS_{res}}{SS_{tot}}")
-
-
+    for title, latex in [
+        ("Entropy",          r"Entropy(S) = -\sum p(x)\log_2 p(x)"),
+        ("Information Gain", r"IG = Entropy(parent) - Weighted\ Entropy(children)"),
+        ("Gini Index",       r"Gini = 1 - \sum p(x)^2"),
+        ("Accuracy",         r"Accuracy = \frac{Correct\ Predictions}{Total\ Predictions}"),
+        ("MAE",              r"MAE = \frac{1}{n}\sum |y - \hat{y}|"),
+        ("MSE",              r"MSE = \frac{1}{n}\sum (y - \hat{y})^2"),
+        ("RMSE",             r"RMSE = \sqrt{MSE}"),
+        ("R² Score",         r"R^2 = 1 - \frac{SS_{res}}{SS_{tot}}"),
+    ]:
+        st.header(title)
+        st.latex(latex)
+        st.markdown("---")
 
 # =========================================================
 # FOOTER
 # =========================================================
 
 st.markdown("---")
-
 st.markdown("""
 <div class="footer">
     <h4>🌳 Decision Tree Classifier and Decision Tree Regression</h4>

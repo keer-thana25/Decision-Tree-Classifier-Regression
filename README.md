@@ -288,27 +288,6 @@ Project documentation including:
 
 ---
 
-## ⚙️ Installation
-
-### Clone the Repository
-
-```bash
-git clone YOUR_GITHUB_REPOSITORY_LINK
-```
-
-### Navigate to Project Folder
-
-```bash
-cd project-folder
-```
-
-### Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
 
 ## ▶️ Run Locally
 
@@ -318,23 +297,7 @@ Run the Streamlit application using:
 streamlit run app.py
 ```
 
----
 
-## 📷 Screenshots
-
-Add screenshots of your Streamlit application here.
-
-### 🏠 Home Page
-
-(Add Screenshot)
-
-### 🌸 Decision Tree Classifier
-
-(Add Screenshot)
-
-### 🏠 Decision Tree Regression
-
-(Add Screenshot)
 
 ---
 

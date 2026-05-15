@@ -218,11 +218,15 @@ GridSearchCV helps find the **best hyperparameters automatically**.
 
 ```text
 project-folder/
-│── app.py
 │── README.md
+│── app.py
 │── requirements.txt
-│── decision_tree_classifier.ipynb
-│── decision_tree_regression.ipynb
+│
+├── classification/
+│   └── decision_tree_classifier.ipynb
+│
+└── regression/
+    └── decision_tree_regression.ipynb
 ```
 
 ---
